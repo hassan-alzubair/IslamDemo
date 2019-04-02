@@ -1,0 +1,38 @@
+[
+  {
+    "tag": "imsak",
+    "prayer_name": "الإمساك",
+    "prayer_time": "__:__",
+    "alarm_set": false
+  },
+  {
+    "tag": "fajr",
+    "prayer_name": "الفجر",
+    "prayer_time": "__:__",
+    "alarm_set": false
+  },
+  {
+    "tag": "thuhr",
+    "prayer_name": "الظهر",
+    "prayer_time": "__:__",
+    "alarm_set": false
+  },
+  {
+    "tag": "asr",
+    "prayer_name": "العصر",
+    "prayer_time": "__:__",
+    "alarm_set": false
+  },
+  {
+    "tag": "maghrib",
+    "prayer_name": "المغرب",
+    "prayer_time": "__:__",
+    "alarm_set": false
+  },
+  {
+    "tag": "isha",
+    "prayer_name": "العشاء",
+    "prayer_time": "__:__",
+    "alarm_set": false
+  }
+]
