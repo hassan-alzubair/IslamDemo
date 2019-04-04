@@ -8,6 +8,8 @@ public interface HomeInteractor {
 
     interface Callback{
         void onSuccess(List<PrayerTime> times);
+        void onGDate(String date);
+        void onHDate(String date);
         void onError(String err);
     }
 

@@ -35,14 +35,14 @@ public class App extends Application {
         boolean isFirstLaunch = PreferenceManager.getDefaultSharedPreferences(this).getBoolean("first_time", true);
         if (isFirstLaunch) {
             PrayerTimeDao prayerTimeDao = getDaoSession().getPrayerTimeDao();
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_IMSAK, PrayerTime.NAME_IMSAK, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_FAJR, PrayerTime.NAME_FAJR, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_SUNRISE, PrayerTime.NAME_SUNRISE, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_THUHR, PrayerTime.NAME_THUHR, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_ASR, PrayerTime.NAME_ASR, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_SUNSET, PrayerTime.NAME_SUNSET, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_MAGHRIB, PrayerTime.NAME_MAGHRIB, "", false));
-            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_ISHA, PrayerTime.NAME_ISHA, "", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_IMSAK, PrayerTime.NAME_IMSAK, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_FAJR, PrayerTime.NAME_FAJR, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_SUNRISE, PrayerTime.NAME_SUNRISE, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_THUHR, PrayerTime.NAME_THUHR, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_ASR, PrayerTime.NAME_ASR, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_SUNSET, PrayerTime.NAME_SUNSET, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_MAGHRIB, PrayerTime.NAME_MAGHRIB, "00:00", false));
+            prayerTimeDao.insert(new PrayerTime(null, PrayerTime.TAG_ISHA, PrayerTime.NAME_ISHA, "00:00", false));
         }
         PreferenceManager.getDefaultSharedPreferences(this).edit().putBoolean("first_time", false).apply();
     }

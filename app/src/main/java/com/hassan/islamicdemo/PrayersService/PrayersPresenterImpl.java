@@ -26,7 +26,22 @@ public class PrayersPresenterImpl implements PrayersPresenter, PrayersInteractor
     }
 
     @Override
+    public void onSuccessHDate(String hDate) {
+        view.saveHDate(hDate);
+    }
+
+    @Override
+    public void onSuccessGDate(String gDate) {
+        view.saveGDate(gDate);
+    }
+
+    @Override
     public void onError(String err) {
         view.onError(err);
+    }
+
+    @Override
+    public void onLocation(String location) {
+        view.saveAddress(location);
     }
 }

@@ -55,6 +55,9 @@ public class MainActivity extends BaseActivity implements HomeView {
     @BindView(R.id.prayer_recycler)
     RecyclerView recyclerView;
 
+    @BindView(R.id.txt_location)
+    TextView txtLocation;
+
     private PrayersRecyclerAdapter adapter;
     private HomePresenter presenter;
 
@@ -83,6 +86,7 @@ public class MainActivity extends BaseActivity implements HomeView {
             isGPS = isGPSEnable;
         });
 
+        txtLocation.setText(PreferenceManager.getDefaultSharedPreferences(this).getString("address", ""));
 
         locationCallback = new LocationCallback() {
             @Override
@@ -106,8 +110,8 @@ public class MainActivity extends BaseActivity implements HomeView {
         };
         presenter.getPrayerTimes();
         getLocation();
-        if(!isServiceRunning(PrayersService.class)){
-            startService(new Intent(this,PrayersService.class));
+        if (!isServiceRunning(PrayersService.class)) {
+            startService(new Intent(this, PrayersService.class));
         }
     }
 
@@ -185,6 +189,16 @@ public class MainActivity extends BaseActivity implements HomeView {
     }
 
     @Override
+    public void showGDate(String date) {
+        txtGDate.setText(date);
+    }
+
+    @Override
+    public void showHDate(String date) {
+        txtHDate.setText(date);
+    }
+
+    @Override
     public void showError(String err) {
         new AlertDialog.Builder(this)
                 .setMessage(err)
@@ -197,6 +211,9 @@ public class MainActivity extends BaseActivity implements HomeView {
         public void onReceive(Context context, Intent intent) {
             List<PrayerTime> times = intent.getExtras().getParcelableArrayList("times");
             showPrayerTimes(times);
+            txtGDate.setText(PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("g_date", ""));
+            txtHDate.setText(PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("h_date", ""));
+            txtLocation.setText(PreferenceManager.getDefaultSharedPreferences(MainActivity.this).getString("address", ""));
         }
     };
 
@@ -215,7 +232,7 @@ public class MainActivity extends BaseActivity implements HomeView {
     private boolean isServiceRunning(Class<?> clazz) {
         final ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo serviceInfo : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if(clazz.getName().equals(serviceInfo.service.getClassName())){
+            if (clazz.getName().equals(serviceInfo.service.getClassName())) {
                 return true;
             }
         }

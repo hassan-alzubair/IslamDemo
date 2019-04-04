@@ -6,5 +6,12 @@ import java.util.List;
 
 public interface PrayersView {
     void savePrayers(List<PrayerTime> times);
+
+    void saveHDate(String date);
+
+    void saveGDate(String date);
+
+    void saveAddress(String address);
+
     void onError(String err);
 }

@@ -12,4 +12,10 @@ public interface PrayersApiService {
             @Query("latitude") double latitude,
             @Query("longitude") double longitude,
             @Query("method") int method);
+
+    @GET("json")
+    Call<ResponseBody> getLocation(
+            @Query("latlng") String latLng,
+            @Query("sensor") boolean sensor,
+            @Query("key") String key);
 }

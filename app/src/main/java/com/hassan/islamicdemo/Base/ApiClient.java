@@ -7,6 +7,7 @@ import retrofit2.Retrofit;
 public class ApiClient {
 
     private static Retrofit aladthanInstance;
+    private static Retrofit googleApiInstance;
 
     private ApiClient() {
     }
@@ -18,5 +19,14 @@ public class ApiClient {
                     .build();
         }
         return aladthanInstance;
+    }
+
+    public static Retrofit getGoogleApiClient() {
+        if (googleApiInstance == null) {
+            googleApiInstance = new Retrofit.Builder()
+                    .baseUrl(AppConstants.GOOGLE_API_CLIENT)
+                    .build();
+        }
+        return googleApiInstance;
     }
 }

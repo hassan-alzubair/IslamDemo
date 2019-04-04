@@ -22,8 +22,23 @@ public class HomePresenterImpl implements HomePresenter, HomeInteractor.Callback
     }
 
     @Override
+    public void getDates() {
+
+    }
+
+    @Override
     public void onSuccess(List<PrayerTime> times) {
         view.showPrayerTimes(times);
+    }
+
+    @Override
+    public void onGDate(String date) {
+        view.showGDate(date);
+    }
+
+    @Override
+    public void onHDate(String date) {
+        view.showHDate(date);
     }
 
     @Override

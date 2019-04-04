@@ -1,55 +1,38 @@
 package com.hassan.islamicdemo.PrayersService;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Parcelable;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
 import com.hassan.islamicdemo.Base.App;
-import com.hassan.islamicdemo.Home.MainActivity;
 import com.hassan.islamicdemo.Home.PrayerTime;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Executor;
+
+import static com.hassan.islamicdemo.Utils.AppConstants.TAG;
 
 
 public class PrayersService extends Service implements PrayersView {
 
-    private boolean isContinue = false;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private double wayLatitude = 0.0, wayLongitude = 0.0;
-    private LocationRequest locationRequest;
-    private LocationCallback locationCallback;
     private LocationManager locationManager;
 
-
-    private static final long INTERVAL = 2 * 60 * 60 * 1000;
+    private static final long INTERVAL = 30 * 1000;//2 * 60 * 60 * 1000;
     private boolean serviceRunning = true;
     private PrayersPresenter presenter;
 
@@ -61,48 +44,26 @@ public class PrayersService extends Service implements PrayersView {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(10 * 1000);
-        locationRequest.setFastestInterval(5 * 1000);
+        Log.d(TAG, "onStartCommand: ");
+        presenter = new PrayersPresenterImpl(new PrayersInteractorImpl(), this);
         locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location location : locationResult.getLocations()) {
-                    if (location != null) {
-                        wayLatitude = location.getLatitude();
-                        wayLongitude = location.getLongitude();
-                        if (!isContinue) {
-                            saveLocation(wayLatitude, wayLongitude);
-                        }
-                        if (!isContinue && mFusedLocationClient != null) {
-                            mFusedLocationClient.removeLocationUpdates(locationCallback);
-                        }
-                    }
-                }
-            }
-        };
-
-
-        presenter = new PrayersPresenterImpl(new PrayersInteractorImpl(), this);
         new Thread(() -> {
             while (serviceRunning) {
                 if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    getLocation();
-                }
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                if (preferences.getString("location", null) != null) {
-                    String coords = preferences.getString("location", "0.0,0.0");
-                    double lat = Double.parseDouble(coords.split(",")[0]);
-                    double lng = Double.parseDouble(coords.split(",")[1]);
-                    presenter.getPrayers(lat, lng, 4);
+                    getLocation(location -> {
+                        double lat = location.getLatitude();
+                        double lng = location.getLongitude();
+                        presenter.getPrayers(lat, lng, 4);
+                    });
+                } else {
+                    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                    if (preferences.getString("location", null) != null) {
+                        String coords = preferences.getString("location", "0.0,0.0");
+                        double lat = Double.parseDouble(coords.split(",")[0]);
+                        double lng = Double.parseDouble(coords.split(",")[1]);
+                        presenter.getPrayers(lat, lng, 4);
+                    }
                 }
                 try {
                     Thread.sleep(INTERVAL);
@@ -118,21 +79,45 @@ public class PrayersService extends Service implements PrayersView {
         PreferenceManager.getDefaultSharedPreferences(this).edit().putString("location", wayLatitude + "," + wayLongitude).apply();
     }
 
-    private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_DENIED
-                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_DENIED) {
-            if (isContinue) {
-                mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    @SuppressLint("MissingPermission")
+    private void getLocation(LocationFetchedListener listener) {
+        Log.d(TAG, "getLocation: ");
+        if (locationManager != null) {
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                saveLocation(location.getLatitude(), location.getLongitude());
+                if (listener != null) {
+                    listener.onLocationFetched(location);
+                }
             } else {
-                mFusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
-                    if (location != null) {
-                        wayLatitude = location.getLatitude();
-                        wayLongitude = location.getLongitude();
-                        saveLocation(wayLatitude, wayLongitude);
-                    } else {
-                        mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+                LocationListener mListener = new LocationListener() {
+                    @Override
+                    public void onLocationChanged(Location location) {
+                        if (location != null) {
+                            saveLocation(location.getLatitude(), location.getLongitude());
+                            if (listener != null) {
+                                listener.onLocationFetched(location);
+                            }
+                        }
+                        locationManager.removeUpdates(this);
                     }
-                });
+
+                    @Override
+                    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String s) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String s) {
+
+                    }
+                };
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mListener, Looper.getMainLooper());
             }
         }
     }
@@ -170,13 +155,34 @@ public class PrayersService extends Service implements PrayersView {
             }
         }
         Intent intent = new Intent("change_times_receiver");
-        Collections.sort(arrayList, (prayerTime, t1) -> (Integer.parseInt(t1.getId().toString())) < (Integer.parseInt(prayerTime.getId().toString())) ? 0:-1);
+        Collections.sort(arrayList, (prayerTime, t1) -> (Integer.parseInt(t1.getId().toString())) < (Integer.parseInt(prayerTime.getId().toString())) ? 0 : -1);
         intent.putParcelableArrayListExtra("times", arrayList);
         sendBroadcast(intent);
+        Log.d(TAG, "change_times_receiver");
+    }
+
+    @Override
+    public void saveHDate(String date) {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("h_date", date).apply();
+    }
+
+    @Override
+    public void saveGDate(String date) {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("g_date", date).apply();
+    }
+
+    @Override
+    public void saveAddress(String address) {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("address",address).apply();
     }
 
     @Override
     public void onError(String err) {
 
+    }
+
+
+    interface LocationFetchedListener {
+        void onLocationFetched(Location location);
     }
 }

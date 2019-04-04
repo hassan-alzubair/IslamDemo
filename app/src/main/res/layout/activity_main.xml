@@ -4,17 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layoutDirection="rtl">
+
     <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
         android:id="@+id/toolbar"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:layout_height="wrap_content" />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark" />
 
     <FrameLayout
-        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar">
 
         <ImageView
             android:layout_width="match_parent"
@@ -25,34 +26,46 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="40dp"
-            android:background="#99000000" >
+            android:background="#99000000"
+            android:paddingTop="10dp">
+
             <TextView
                 android:id="@+id/g_date"
-                 android:textColor="#FFF"
-                android:textSize="20sp"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_height="wrap_content" />
+                android:textColor="#FFF"
+                android:textSize="20sp" />
+
             <TextView
                 android:id="@+id/h_date"
-                 android:layout_below="@id/g_date"
-                android:textColor="#FFF"
-                android:textSize="20sp"
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/g_date"
                 android:layout_centerHorizontal="true"
-                android:layout_height="wrap_content" />
+                android:textColor="#FFF"
+                android:textSize="20sp" />
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:id="@+id/txt_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/h_date"
+                android:layout_centerHorizontal="true"
+                android:textColor="#FFF"
+                android:textSize="15sp" />
 
         </RelativeLayout>
     </FrameLayout>
 
     <android.support.v7.widget.RecyclerView
+        android:id="@+id/prayer_recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:id="@+id/prayer_recycler"
         android:background="@drawable/times_background"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
